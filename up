@@ -13,5 +13,6 @@ git push
 
 echo "Changes pushed to remote."
 
-# make the script executable: chmod +x up.txt
+# make the script executable: chmod +x up
+# run it like ./up "commit message"
 
