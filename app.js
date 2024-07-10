@@ -1,45 +1,54 @@
-if ("geolocation" in navigator) {
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      document.getElementById(
-        "location"
-      ).textContent = `GPS Coordinates: Latitude: ${lat} °, Longitude: ${lon} °`;
+async function fetchWeather(lat, lon) {
+  const serverUrl = `http://localhost:3000/weather?lat=${lat}&lon=${lon}`;
 
-      const apiKey = "a30e528370497f31ec126e19be3c1a3e";
-      const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
-
-      try {
-        const response = await fetch(weatherUrl);
-        if (!response.ok) {
-          const errorDetails = await response.text();
-          console.error("Failed to fetch weather data:", errorDetails);
-          throw new Error(
-            "Weather data could not be fetched. Details: " + errorDetails
-          );
-        }
-        const weatherData = await response.json();
-        const sunriseTime = new Date(
-          weatherData.sys.sunrise * 1000
-        ).toLocaleTimeString();
-        const sunsetTime = new Date(
-          weatherData.sys.sunset * 1000
-        ).toLocaleTimeString();
-        document.getElementById(
-          "weather"
-        ).textContent = `Nearest City: ${weatherData.name}, Temperature: ${weatherData.main.temp} °C, Weather: ${weatherData.weather[0].main}, Sunrise: ${sunriseTime}, Sunset: ${sunsetTime}`;
-      } catch (error) {
-        console.error("Error fetching weather data:", error);
-        document.getElementById("weather").textContent =
-          "Error fetching weather data. Check console for more details.";
-      }
-    },
-    (error) => {
-      console.error("Geolocation error:", error);
-      alert("Error getting your location. Details: " + error.message);
+  try {
+    const response = await fetch(serverUrl);
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      throw new Error(
+        "Weather data could not be fetched from server. Details: " +
+          errorDetails
+      );
     }
-  );
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching weather data from server:", error);
+    throw error;
+  }
+}
+
+function displayWeatherData(weatherData) {
+  const sunriseTime = new Date(
+    weatherData.sys.sunrise * 1000
+  ).toLocaleTimeString();
+  const sunsetTime = new Date(
+    weatherData.sys.sunset * 1000
+  ).toLocaleTimeString();
+  document.getElementById(
+    "weather"
+  ).textContent = `Nearest City: ${weatherData.name}, Temperature: ${weatherData.main.temp} °C, Weather: ${weatherData.weather[0].main}, Sunrise: ${sunriseTime}, Sunset: ${sunsetTime}`;
+}
+
+function handleError(error) {
+  console.error("Geolocation error:", error);
+  alert("Error getting your location. Details: " + error.message);
+}
+
+if ("geolocation" in navigator) {
+  navigator.geolocation.getCurrentPosition(async (position) => {
+    const { latitude: lat, longitude: lon } = position.coords;
+    document.getElementById(
+      "location"
+    ).textContent = `GPS Coordinates: Latitude: ${lat} °, Longitude: ${lon} °`;
+
+    try {
+      const weatherData = await fetchWeather(lat, lon);
+      displayWeatherData(weatherData);
+    } catch (error) {
+      document.getElementById("weather").textContent =
+        "Error fetching weather data. Check console for more details.";
+    }
+  }, handleError);
 } else {
   alert("Geolocation is not supported by your browser.");
 }
