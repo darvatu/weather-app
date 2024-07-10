@@ -5,7 +5,7 @@ if ("geolocation" in navigator) {
       const lon = position.coords.longitude;
       document.getElementById(
         "location"
-      ).textContent = `Latitude: ${lat} °, Longitude: ${lon} °`;
+      ).textContent = `GPS Coordinates: Latitude: ${lat} °, Longitude: ${lon} °`;
 
       const apiKey = "a30e528370497f31ec126e19be3c1a3e";
       const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
@@ -22,7 +22,7 @@ if ("geolocation" in navigator) {
         const weatherData = await response.json();
         document.getElementById(
           "weather"
-        ).textContent = `Temperature: ${weatherData.main.temp} °C, Weather: ${weatherData.weather[0].main}`;
+        ).textContent = `Nearest City: ${weatherData.name}, Temperature: ${weatherData.main.temp} °C, Weather: ${weatherData.weather[0].main}`;
       } catch (error) {
         console.error("Error fetching weather data:", error);
         document.getElementById("weather").textContent =
