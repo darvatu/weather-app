@@ -20,9 +20,15 @@ if ("geolocation" in navigator) {
           );
         }
         const weatherData = await response.json();
+        const sunriseTime = new Date(
+          weatherData.sys.sunrise * 1000
+        ).toLocaleTimeString();
+        const sunsetTime = new Date(
+          weatherData.sys.sunset * 1000
+        ).toLocaleTimeString();
         document.getElementById(
           "weather"
-        ).textContent = `Nearest City: ${weatherData.name}, Temperature: ${weatherData.main.temp} °C, Weather: ${weatherData.weather[0].main}`;
+        ).textContent = `Nearest City: ${weatherData.name}, Temperature: ${weatherData.main.temp} °C, Weather: ${weatherData.weather[0].main}, Sunrise: ${sunriseTime}, Sunset: ${sunsetTime}`;
       } catch (error) {
         console.error("Error fetching weather data:", error);
         document.getElementById("weather").textContent =
